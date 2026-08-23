@@ -1,0 +1,18 @@
+# Backup files
+*.bak
+*.backup
+~*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Private deployment docs (keep only in private backup)

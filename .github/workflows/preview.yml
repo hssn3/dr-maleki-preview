@@ -1,0 +1,33 @@
+name: Deploy Preview
+
+# با هر پوش به main، فایل‌های سایت به‌صورت خودکار به مخزن عمومی پیش‌نمایش
+# (dr-maleki-preview) منتقل و GitHub Pages به‌روز می‌شود.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-preview:
+    if: github.repository == 'hssn3/dr-maleki'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push site to preview repo
+        env:
+          PREVIEW_TOKEN: ${{ secrets.PREVIEW_TOKEN }}
+        run: |
+          git config --unset-all http.https://github.com/.extraheader || true
+          rm -f admin.html PROJECT.md README.md
+          git checkout -q --orphan preview-deploy
+          git add -A
+          git -c user.name=preview-bot -c user.email=bot@users.noreply.github.com commit -qm "preview deploy"
+          git remote add preview "https://x-access-token:${PREVIEW_TOKEN}@github.com/hssn3/dr-maleki-preview.git"
+          git push --force preview preview-deploy:refs/heads/main
